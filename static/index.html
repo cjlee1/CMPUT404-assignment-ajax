@@ -40,20 +40,23 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
                 if (xhr.status==200) {
                     //XXX: parse some JSON from the request!
                     //XXX: Pass the data to the callback!
+                    // this was shown in slides by abram Hindle
+                    // in the function getjson part how to do callbacks
+                    // http://webdocs.cs.ualberta.ca/~hindle1/2014/CMPUT404-AJAX-Slides/
                     req_resp= xhr.response;
                     if(callback){
                        //  JSON.parse(text, reviver) from json2.js
                       //       This method parses a JSON text to produce an object or array.
                       //       It can throw a SyntaxError exception.
-                      req_data= JSON.parse(req_resp)
                       // callback function makes sure certain code doesnt execute until other is done
-                      callback(req_data)
+                      req_data= JSON.parse(req_resp);
+                      callback(req_data);
 
                     }
                 }
             }
             catch(e) {
-                alert('Error: ' + e.name);
+                alert('Error: ' + e.name +xhr.status);
             }
         }
     };
@@ -64,39 +67,78 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
     // we know we are GET'ing something if the object is empty while if it isnt then we are POST'ing
     if (!objects){
       xhr.open("GET",url);
-
+      xhr.send();
     }
     else{
       xhr.open("POST",url)
-    }
-    //XXX: set the mimetype and the accept headers!
-    // Remember to use application/json !
-    //mozilla
-    // how to set the request headers for XMLHTTPRequest https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/setRequestHeader
-    // XMLHttpRequest.setRequestHeader(header, value)
-      // header- The name of the header whose value is to be set.
-//    value - The value to set as the body of the header.
+      //XXX: set the mimetype and the accept headers!
+      // Remember to use application/json !
+      //mozilla
+      // how to set the request headers for XMLHTTPRequest https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/setRequestHeader
+      // XMLHttpRequest.setRequestHeader(header, value)
+        // header- The name of the header whose value is to be set.
+  //    value - The value to set as the body of the header.
 
-    xhr.setRequestHeader("Accept","application/json")
-    xhr.setRequestHeader("Content-Type","application/json")
-    xhr.send(JSON.stringify(objects))
+      xhr.setRequestHeader("Accept","application/json")
+      xhr.setRequestHeader("Content-Type","application/json")
+      xhr.send(JSON.stringify(objects))
+    }
+
 }
 
 
 world = {};
+// mozilla
+// how to make a image in js
+//https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/Image
+var imgStart = new Image();
+//https://en.wikipedia.org/wiki/File:ProhibitionSign2.svg - got image from here
+imgStart.src = "./pic2.svg";
+
+
+var imgStop = new Image();
+// https://commons.wikimedia.org/wiki/File:Singapore_road_sign_-_Mandatory_-_Manual_traffic_control_-_Go.svg- got image from here
+imgStop.src = "./pic1.svg";
 
 //XXX: TODO Make this prettier!
 function drawCircle(context,entity) {
     with(context) {
-        beginPath();
-        lineWidth = 3;
         var x = entity["x"];
         var y = entity["y"];
-        //moveTo(x,y);
-        fillStyle = entity["colour"];
-        strokeStyle = fillStyle;
-        arc(x, y, (entity["radius"])?entity["radius"]:50, 0, 2.0 * Math.PI, false);
-        stroke();
+        iconType = entity["icon"];
+
+        //w3schools
+        //how to draw image on Canvas_API
+        //https://www.w3schools.com/tags/canvas_drawimage.asp
+
+
+        if (iconType==="imgStart"){
+          drawImage(imgStart,x-25,y-20,45,40);
+        }
+        else if (iconType==="imgStop"){
+          drawImage(imgStop,x-25,y-20,45,40);
+        }
+        else {
+          beginPath();
+          lineWidth = 3;
+
+          // mozilla
+          //how to draw shapes
+          //https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes
+          fillStyle = entity["colour"];
+          strokeStyle = fillStyle;
+          arc(x, y, 50, 0, Math.PI * 2, true); // Outer circle
+          moveTo(x+15, y+25);
+          lineTo(x-20,y+20);  // Mouth (clockwise)
+          moveTo(x-10, y-10);
+          lineTo(x-15, y-10);  // Left eye
+          moveTo(x+20,y- 10);
+          lineTo(x+15, y-10);  // Right eye
+
+
+
+          stroke();
+      }
     }
 }
 
@@ -168,7 +210,7 @@ function addEntity(entity, data) {
     world[entity] = data;
     drawNextFrame(); // (but should we?)
     //XXX: Send a XHTML Request that updates the entity you just  modified!
-    sendJSONXMLHTTPRequest("/entity/"+entity,data, function(){
+    sendJSONXMLHTTPRequest("/entity/"+entity,world[entity], function(){
       drawNextFrame();
     });
 }
@@ -279,16 +321,16 @@ mouse = (function() {
 // Add the application specific mouse listeners!
 //XXX: TODO Make these prettier!
 mouse.mousedowners.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'blue'});
+    addEntityWithoutName({'x':x,'y':y,'icon':'imgStart','radius':20});
 });
 
 mouse.mouseuppers.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'red'});
+    addEntityWithoutName({'x':x,'y':y,'icon':'imgStop','radius':20});
 });
 
 mouse.mousedraggers.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'green',
-                          'radius':10});
+    addEntityWithoutName({'x':x,'y':y,'colour':'yellow',
+                          'radius':2});
 });
 
 
