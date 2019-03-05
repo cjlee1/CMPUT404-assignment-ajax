@@ -102,11 +102,11 @@ def world():
     elif (request.method == "POST"): #POST method
 
         dict_data=flask_post_json()
-        for k in dict_data.items():
-            for k2 in k[1]:
+        for k,v in dict_data.items():
+            # for k2,v in k.items():
                 # print(k2)
                 # print("hi")
-                myWorld.update(k[0],k2,k[1][k2])
+                myWorld.update(k,k,v)
         return flask.jsonify(myWorld.world()),200
 
 
