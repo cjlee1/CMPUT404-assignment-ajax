@@ -104,8 +104,8 @@ def world():
         dict_data=flask_post_json()
         for k in dict_data.items():
             for k2 in k[1]:
-                print(k2)
-                print("hi")
+                # print(k2)
+                # print("hi")
                 myWorld.update(k[0],k2,k[1][k2])
         return flask.jsonify(myWorld.world()),200
 
