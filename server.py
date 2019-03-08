@@ -102,13 +102,17 @@ def world():
     elif (request.method == "POST"): #POST method
 
         dict_data=flask_post_json()
-        for k,v in dict_data.items():
-            # for k2,v in k.items():
+        for k in dict_data.items():
+            entity=k[0]
+            world =k[1]
+            for k2 in world:
                 # print(k2)
                 # print("hi")
-                myWorld.update(k,k,v)
+                # world=myWorld.world()
+                # print(world)
+                myWorld.update(entity,k2,world[k2])
 
-                #codegeek 
+                #codegeek
         # returning json to flask
         # https://stackoverflow.com/questions/13081532/return-json-response-from-flask-view
         return flask.jsonify(myWorld.world()),200
