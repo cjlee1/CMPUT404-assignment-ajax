@@ -102,6 +102,9 @@ def world():
     elif (request.method == "POST"): #POST method
 
         dict_data=flask_post_json()
+        # under the assumption that post and get are different because post should post data while get just gets the data
+        # this way will go into the json data, loop over the data , get the entity and have the updated worlds be put into the
+        # current world and the send it
         for k in dict_data.items():
             entity=k[0]
             world =k[1]
